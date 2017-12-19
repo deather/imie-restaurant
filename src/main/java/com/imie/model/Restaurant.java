@@ -46,4 +46,17 @@ public class Restaurant {
 
 		return isFree;
 	}
+
+	public boolean hasTableOccupe() {
+		boolean isOccupe = false;
+
+		for (Table table: this.tables) {
+			if (table.getClient() != null) {
+				isOccupe = true;
+				break;
+			}
+		}
+
+		return isOccupe;
+	}
 }

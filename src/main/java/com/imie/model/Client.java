@@ -11,4 +11,12 @@ public class Client {
 	public void setTable(Table table) {
 		this.table = table;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Table getTable() {
+		return table;
+	}
 }

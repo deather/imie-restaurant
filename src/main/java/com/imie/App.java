@@ -1,15 +1,18 @@
 package com.imie;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.imie.model.*;
 
 public class App {
 
 	private Restaurant restaurant;
+	ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private static Random random = new Random();
+	private static List<Client> clientQuiOntCommandes = new ArrayList<>();
 
 	public static void main(String[] args) {
 		App app = new App();
@@ -29,17 +32,30 @@ public class App {
 		restaurant.add(table3);
 		restaurant.add(waiter);
 
-		List<Article> articles = new ArrayList<>();
+		List<Article> articles = Arrays.asList(
+				new Boisson(1, "Saké", 8.00, 0.20),
+				new Boisson(2, "Kirin Ichiban", 3.5, 0.05),
+				new Aliment(3, "Ramen", 8.00, Arrays.asList(Allergen.OEUF, Allergen.SOJA)),
+				new Aliment(4, "Sushi", 10.00, Collections.singletonList(Allergen.POISSON))
+		);
 
-		Article article = new Article(1, "Saké");
-		Article article2 = new Article(2, "Kirin Ichiban");
-		Article article3 = new Article(3, "Ramen");
-		Article article4 = new Article(4, "Sushi");
+		executorService.submit(() -> {
+			try {
+				while (true) {
+					if (!clientQuiOntCommandes.isEmpty()) {
+						Client clientRandom = clientQuiOntCommandes.remove(random.nextInt(clientQuiOntCommandes.size()));
 
-		articles.add(article);
-		articles.add(article2);
-		articles.add(article3);
-		articles.add(article4);
+						System.out.println(MessageFormat.format("Le client {0} est parti.", clientRandom.getName()));
+						clientRandom.getTable().setClient(null);
+						clientRandom.setTable(null);
+					}
+
+					Thread.currentThread().sleep(random.nextInt(5) * 1000);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 
 		restaurant.setMenu(new Menu(articles));
 	}
@@ -67,6 +83,8 @@ public class App {
 				Commande commande = prendreCommande(table);
 
 				System.out.println("Merci, votre commande est le numéro : " + commande.getId());
+
+				clientQuiOntCommandes.add(commande.getClient());
 			}
 			else {
 				System.out.println("Désolé nous n'avons plus de place.");
@@ -115,7 +133,16 @@ public class App {
 
 			try {
 				do {
-					System.out.println("// TODO afficher menu");
+					System.out.println("+-----------------------------------+");
+					System.out.println("| CARTE                             |");
+					System.out.println("|===================================|");
+
+					List<Article> articlesMenu = restaurant.getMenu().getArticles();
+
+					for (Article article : articlesMenu)
+						System.out.println(article.toString());
+
+					System.out.println("+-----------------------------------+");
 					System.out.println("Que souhaitez-vous commander ?");
 
 					Scanner scanner = new Scanner(System.in);

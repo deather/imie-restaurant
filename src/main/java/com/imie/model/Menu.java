@@ -10,6 +10,10 @@ public class Menu {
 		this.articles = articles;
 	}
 
+	public List<Article> getArticles() {
+		return this.articles;
+	}
+
 	public List<Article> getArticles(List<Integer> articlesId) {
 		List<Article> articlesFound = new ArrayList<>();
 
