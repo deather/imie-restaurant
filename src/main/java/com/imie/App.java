@@ -5,6 +5,9 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.imie.core.Bar;
+import com.imie.core.Cuisine;
+import com.imie.core.Salle;
 import com.imie.model.*;
 
 public class App {
@@ -12,7 +15,6 @@ public class App {
 	private Restaurant restaurant;
 	ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private static Random random = new Random();
-	private static List<Client> clientsPretApartir = new ArrayList<>();
 
 	public static void main(String[] args) {
 		App app = new App();
@@ -39,11 +41,20 @@ public class App {
 				new Aliment(4, "Sushi", 10.00, Collections.singletonList(Allergen.POISSON), 10)
 		);
 
+		restaurant.setMenu(new Menu(articles));
+		restaurant.setBar(new Bar());
+		restaurant.setCuisine(new Cuisine());
+		restaurant.setSalle(new Salle());
+		restaurant.getSalle().setCuisine(restaurant.getCuisine());
+		restaurant.getSalle().setBar(restaurant.getBar());
+		restaurant.getBar().setSalle(restaurant.getSalle());
+		restaurant.getCuisine().setSalle(restaurant.getSalle());
+
 		executorService.submit(() -> {
 			try {
 				while (true) {
-					if (!clientsPretApartir.isEmpty()) {
-						Client clientRandom = clientsPretApartir.remove(random.nextInt(clientsPretApartir.size()));
+					if (!restaurant.getSalle().getClientsPretApartir().isEmpty()) {
+						Client clientRandom = restaurant.getSalle().getClientsPretApartir().remove(random.nextInt(restaurant.getSalle().getClientsPretApartir().size()));
 
 						System.out.println(MessageFormat.format("Le client {0} est parti.", clientRandom.getName()));
 						clientRandom.getTable().setClient(null);
@@ -56,13 +67,6 @@ public class App {
 				e.printStackTrace();
 			}
 		});
-
-		restaurant.setMenu(new Menu(articles));
-		restaurant.setBar(new Bar());
-		restaurant.setCuisine(new Cuisine());
-		restaurant.setSalle(new Salle());
-		restaurant.getSalle().ajouter(restaurant.getBar());
-		restaurant.getSalle().ajouter(restaurant.getCuisine());
 	}
 
 	public void run() {
@@ -89,7 +93,7 @@ public class App {
 
 				System.out.println("Merci, votre commande est le numéro : " + commande.getId());
 
-//				restaurant.getSalle().notifier(commande);
+				restaurant.getSalle().envoyer(commande);
 			}
 			else {
 				System.out.println("Désolé nous n'avons plus de place.");

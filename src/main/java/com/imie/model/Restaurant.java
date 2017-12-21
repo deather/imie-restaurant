@@ -3,9 +3,9 @@ package com.imie.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.imie.Bar;
-import com.imie.Cuisine;
-import com.imie.Salle;
+import com.imie.core.Bar;
+import com.imie.core.Cuisine;
+import com.imie.core.Salle;
 
 public class Restaurant {
 	private Waiter serveur;

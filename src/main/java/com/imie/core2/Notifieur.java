@@ -1,4 +1,4 @@
-package com.imie;
+package com.imie.core2;
 
 import java.util.ArrayList;
 import java.util.List;
