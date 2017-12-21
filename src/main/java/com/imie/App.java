@@ -12,7 +12,7 @@ public class App {
 	private Restaurant restaurant;
 	ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private static Random random = new Random();
-	private static List<Client> clientQuiOntCommandes = new ArrayList<>();
+	private static List<Client> clientsPretApartir = new ArrayList<>();
 
 	public static void main(String[] args) {
 		App app = new App();
@@ -33,17 +33,17 @@ public class App {
 		restaurant.add(waiter);
 
 		List<Article> articles = Arrays.asList(
-				new Boisson(1, "Saké", 8.00, 0.20),
-				new Boisson(2, "Kirin Ichiban", 3.5, 0.05),
-				new Aliment(3, "Ramen", 8.00, Arrays.asList(Allergen.OEUF, Allergen.SOJA)),
-				new Aliment(4, "Sushi", 10.00, Collections.singletonList(Allergen.POISSON))
+				new Boisson(1, "Saké", 8.00, 0.20, 1),
+				new Boisson(2, "Kirin Ichiban", 3.5, 0.05, 1),
+				new Aliment(3, "Ramen", 8.00, Arrays.asList(Allergen.OEUF, Allergen.SOJA), 10),
+				new Aliment(4, "Sushi", 10.00, Collections.singletonList(Allergen.POISSON), 10)
 		);
 
 		executorService.submit(() -> {
 			try {
 				while (true) {
-					if (!clientQuiOntCommandes.isEmpty()) {
-						Client clientRandom = clientQuiOntCommandes.remove(random.nextInt(clientQuiOntCommandes.size()));
+					if (!clientsPretApartir.isEmpty()) {
+						Client clientRandom = clientsPretApartir.remove(random.nextInt(clientsPretApartir.size()));
 
 						System.out.println(MessageFormat.format("Le client {0} est parti.", clientRandom.getName()));
 						clientRandom.getTable().setClient(null);
@@ -58,6 +58,11 @@ public class App {
 		});
 
 		restaurant.setMenu(new Menu(articles));
+		restaurant.setBar(new Bar());
+		restaurant.setCuisine(new Cuisine());
+		restaurant.setSalle(new Salle());
+		restaurant.getSalle().ajouter(restaurant.getBar());
+		restaurant.getSalle().ajouter(restaurant.getCuisine());
 	}
 
 	public void run() {
@@ -84,7 +89,7 @@ public class App {
 
 				System.out.println("Merci, votre commande est le numéro : " + commande.getId());
 
-				clientQuiOntCommandes.add(commande.getClient());
+//				restaurant.getSalle().notifier(commande);
 			}
 			else {
 				System.out.println("Désolé nous n'avons plus de place.");

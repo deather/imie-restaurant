@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 public class Aliment extends Article {
 	private List<Allergen> allergens;
 
-	public Aliment(int id, String name, double prix, List<Allergen> allergens) {
-		super(id, name, prix);
+	public Aliment(int id, String name, double prix, List<Allergen> allergens, int tempsPreparation) {
+		super(id, name, prix, tempsPreparation);
 		this.allergens = allergens;
 	}
 

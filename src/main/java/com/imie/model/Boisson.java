@@ -5,8 +5,8 @@ import java.text.MessageFormat;
 public class Boisson extends Article {
 	private double alcoholPercentage;
 
-	public Boisson(int id, String name, double prix, double alcoholPercentage) {
-		super(id, name, prix);
+	public Boisson(int id, String name, double prix, double alcoholPercentage, int tempsPreparation) {
+		super(id, name, prix, tempsPreparation);
 		this.alcoholPercentage = alcoholPercentage;
 	}
 
