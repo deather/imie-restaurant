@@ -1,21 +1,40 @@
 package com.imie.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.*;
+
+@Entity
+@javax.persistence.Table(name = "commande")
 public class Commande {
+	@Id
+	@GeneratedValue(generator = "seq_commande_id", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "seq_commande_id", sequenceName = "seq_commande_id", allocationSize = 1)
 	private int id;
-	private Table table;
-	private List<Article> articles;
-	private List<Article> articlesPret;
-	private Client client;
 
-	public Commande(int i, List<Article> articles, Table table) {
-		this.id = i;
+	@ManyToOne
+	private Table table;
+
+	@ManyToOne
+	private Waiter waiter;
+
+	@ManyToMany
+	private List<Article> articles;
+
+	@CollectionTable(name = "commande_articles_pret")
+	@ManyToMany
+	private List<Article> articlesPret;
+
+	public Commande() {
+	}
+
+	public Commande(List<Article> articles, Table table) {
 		this.articles = articles;
 		this.articlesPret = new ArrayList<>();
 		this.table = table;
-		this.client = table.getClient();
 	}
 
 	public int getId() {
@@ -31,7 +50,7 @@ public class Commande {
 	}
 
 	public Client getClient() {
-		return client;
+		return table.getClient();
 	}
 
 	public boolean estPrete() {

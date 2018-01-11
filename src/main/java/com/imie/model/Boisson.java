@@ -2,11 +2,22 @@ package com.imie.model;
 
 import java.text.MessageFormat;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("BOISSON")
 public class Boisson extends Article {
+	@Column(name = "alcohol_percentage")
 	private double alcoholPercentage;
 
-	public Boisson(int id, String name, double prix, double alcoholPercentage, int tempsPreparation) {
-		super(id, name, prix, tempsPreparation);
+	public Boisson() {
+		super("", 0.0, 0);
+	}
+
+	public Boisson(String name, double prix, double alcoholPercentage, int tempsPreparation) {
+		super(name, prix, tempsPreparation);
 		this.alcoholPercentage = alcoholPercentage;
 	}
 

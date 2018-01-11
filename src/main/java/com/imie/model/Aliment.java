@@ -2,21 +2,32 @@ package com.imie.model;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Aliment extends Article {
-	private List<Allergen> allergens;
+import javax.persistence.*;
 
-	public Aliment(int id, String name, double prix, List<Allergen> allergens, int tempsPreparation) {
-		super(id, name, prix, tempsPreparation);
+@Entity
+@DiscriminatorValue("ALIMENT")
+public class Aliment extends Article {
+	@ElementCollection
+	@Enumerated(EnumType.STRING)
+	private Set<Allergen> allergens;
+
+	public Aliment() {
+		super("", 0.0, 0);
+	}
+
+	public Aliment(String name, double prix, Set<Allergen> allergens, int tempsPreparation) {
+		super(name, prix, tempsPreparation);
 		this.allergens = allergens;
 	}
 
-	public List<Allergen> getAllergens() {
+	public Set<Allergen> getAllergens() {
 		return allergens;
 	}
 
-	public void setAllergens(List<Allergen> allergens) {
+	public void setAllergens(Set<Allergen> allergens) {
 		this.allergens = allergens;
 	}
 

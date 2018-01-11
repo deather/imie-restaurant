@@ -1,0 +1,34 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+	<!-- Déclaration d'un contexte de persistence. ATTENTION LE NOM DOIT ÊTRE UNIQUE CAR IL SERA UTILISÉ DANS LE CODE PLUS TARD. -->
+	<persistence-unit name="restaurant-jpa" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<!-- Déclaration des @Entity contenues dans notre application -->
+		<class>com.imie.model.Table</class>
+		<class>com.imie.model.Aliment</class>
+		<class>com.imie.model.Boisson</class>
+		<class>com.imie.model.Article</class>
+		<class>com.imie.model.Waiter</class>
+		<class>com.imie.model.Commande</class>
+		<class>com.imie.model.Client</class>
+
+		<properties>
+			<!-- URI pour que jdbc puisse se connecter à la base de données. Ici nous avons configuré l'URI pour postgresql donc à adapter en fonction du SGBD -->
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/restaurant"/>
+			<!-- Utilisateur que doit utiliser JDBC pour s'authentifier -->
+			<property name="javax.persistence.jdbc.user" value="charles.jourdan"/>
+			<!-- et le mot de passe associé à ce user -->
+			<property name="javax.persistence.jdbc.password" value="fH4wZFWUa2dZizV"/>
+			<!-- On spécifie le driver JDBC à utiliser. Ici nous avons utilisé le driver de postgresql donc à adapter en fonction du SGBD -->
+			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+
+			<!-- ATTENTION ICI CE SONT DES PROPRIÉTÉS PROPRES À HIBERNATE CE QUI VEUT DIRE QU'ELLES NE SERVIRONT PAS SI NOUS CHANGEONS D'IMPLÉMENTATION -->
+			<!-- Cette propriété permet de dire à hibernate de générer autotmatiquement les classes en fonction des entités que l'on a déclaré dans l'application -->
+			<property name="hibernate.hbm2ddl.auto" value="create" />
+			<!-- Cette propriété permet d'afficher les requêtes envoyées en base. Ça peut-être très pratique pour le debuggage -->
+			<!--<property name="hibernate.show_sql" value="true" />-->
+		</properties>
+	</persistence-unit>
+</persistence>

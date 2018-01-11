@@ -1,12 +1,17 @@
 package com.imie.model;
 
-public class Table {
-	private int id;
-	private Client client;
+import javax.persistence.*;
 
-	public Table(int id) {
-		this.id = id;
-	}
+@Entity
+@javax.persistence.Table(name = "\"table\"")
+public class Table {
+	@Id
+	@GeneratedValue(generator = "seq_table_id", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "seq_table_id", sequenceName = "seq_table_id", allocationSize = 1)
+	private int id;
+
+	@OneToOne
+	private Client client;
 
 	public void setClient(Client client) {
 		this.client = client;

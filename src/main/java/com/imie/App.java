@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import com.imie.core.Bar;
 import com.imie.core.Cuisine;
 import com.imie.core.Salle;
+import com.imie.daos.*;
 import com.imie.model.*;
 
 public class App {
@@ -15,6 +16,12 @@ public class App {
 	private Restaurant restaurant;
 	ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private static Random random = new Random();
+
+	private TableDAO tableDAO = new TableDAO();
+	private ClientDAO clientDAO = new ClientDAO();
+	private CommandeDAO commandeDAO = new CommandeDAO();
+	private AlimentDAO alimentDAO = new AlimentDAO();
+	private BoissonDAO boissonDAO = new BoissonDAO();
 
 	public static void main(String[] args) {
 		App app = new App();
@@ -24,21 +31,31 @@ public class App {
 
 	public void init() {
 		restaurant = new Restaurant();
-		Table table = new Table(1);
-		Table table2 = new Table(2);
-		Table table3 = new Table(3);
-		Waiter waiter = new Waiter();
+
+		Table table = this.tableDAO.create(new Table());
+		Table table2 = this.tableDAO.create(new Table());
+		Table table3 = this.tableDAO.create(new Table());
 
 		restaurant.add(table);
 		restaurant.add(table2);
 		restaurant.add(table3);
+
+		Waiter waiter = new Waiter();
 		restaurant.add(waiter);
 
 		List<Article> articles = Arrays.asList(
-				new Boisson(1, "Saké", 8.00, 0.20, 1),
-				new Boisson(2, "Kirin Ichiban", 3.5, 0.05, 1),
-				new Aliment(3, "Ramen", 8.00, Arrays.asList(Allergen.OEUF, Allergen.SOJA), 10),
-				new Aliment(4, "Sushi", 10.00, Collections.singletonList(Allergen.POISSON), 10)
+				this.boissonDAO.create(
+						new Boisson("Saké", 8.00, 0.20, 1)
+				),
+				this.boissonDAO.create(
+						new Boisson("Kirin Ichiban", 3.5, 0.05, 1)
+				),
+				this.alimentDAO.create(
+						new Aliment("Ramen", 8.00, new HashSet<>(Arrays.asList(Allergen.OEUF, Allergen.SOJA)), 10)
+				),
+				this.alimentDAO.create(
+						new Aliment("Sushi", 10.00, Collections.singleton(Allergen.POISSON), 10)
+				)
 		);
 
 		restaurant.setMenu(new Menu(articles));
@@ -57,8 +74,12 @@ public class App {
 						Client clientRandom = restaurant.getSalle().getClientsPretApartir().remove(random.nextInt(restaurant.getSalle().getClientsPretApartir().size()));
 
 						System.out.println(MessageFormat.format("Le client {0} est parti.", clientRandom.getName()));
-						clientRandom.getTable().setClient(null);
-						clientRandom.setTable(null);
+						Client clientDb = this.clientDAO.get(clientRandom.getId());
+
+						clientDb.getTable().setClient(null);
+						this.tableDAO.update(clientDb.getTable());
+						clientDb.setTable(null);
+						this.clientDAO.update(clientDb);
 					}
 
 					Thread.currentThread().sleep(random.nextInt(5) * 1000);
@@ -85,6 +106,8 @@ public class App {
 			if (table != null) {
 				table.setClient(client);
 				client.setTable(table);
+				this.tableDAO.update(table);
+				this.clientDAO.update(client);
 
 				System.out.println("Veuillez vous installer à la table : " + table.getId());
 
@@ -94,8 +117,7 @@ public class App {
 				System.out.println("Merci, votre commande est le numéro : " + commande.getId());
 
 				restaurant.getSalle().envoyer(commande);
-			}
-			else {
+			} else {
 				System.out.println("Désolé nous n'avons plus de place.");
 			}
 		}
@@ -111,9 +133,9 @@ public class App {
 
 			if (nameRead.isEmpty())
 				System.out.println("Je n'ai pas compris votre nom.");
-		} while(nameRead.isEmpty());
+		} while (nameRead.isEmpty());
 
-		return new Client(nameRead);
+		return this.clientDAO.create(new Client(nameRead));
 	}
 
 	public Table chooseTable() {
@@ -125,12 +147,11 @@ public class App {
 				int randomIndex = random.nextInt(this.restaurant.getTables().size());
 				table = this.restaurant.getTables().get(randomIndex);
 			} while (table.getClient() != null);
-		}
-		else {
+		} else {
 			table = null;
 		}
 
-		return table;
+		return this.tableDAO.get(table.getId());
 	}
 
 	public Commande prendreCommande(Table table) {
@@ -162,13 +183,15 @@ public class App {
 
 				for (String articleIdInString : articlesIdSplitted)
 					articlesId.add(Integer.parseInt(articleIdInString));
-			} catch(NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				System.out.println("T'es un peu bête j'attends des chiffres");
 			}
 
 			articles = this.restaurant.getMenu().getArticles(articlesId);
-		} while(articles.isEmpty());
+		} while (articles.isEmpty());
 
-		return new Commande(this.restaurant.getCommandeCounter(), articles, table);
+		return this.commandeDAO.create(
+				new Commande(articles, table)
+		);
 	}
 }
